@@ -1,10 +1,10 @@
-import { List } from './ImageGallery.styled';
-import { getApi } from '../utils/Api';
-import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
-import { Button } from '../Button/Button';
+import { getApi } from '../../utils/Api';
 import { Component } from 'react';
 import { toast } from 'react-toastify';
+import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 import { Loader } from 'components/Loader/Loader';
+import { Button } from '../Button/Button';
+import { List } from './ImageGallery.styled';
 
 export class ImageGallery extends Component {
   state = {
@@ -35,43 +35,15 @@ export class ImageGallery extends Component {
         this.setState({ isLoader: false });
         if (res.hits.length / 12 === 1) {
           this.setState({ visibleBtnLoading: true });
-          toast.success('✅ Запит пройшов успішно', {
-            position: 'top-right',
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'colored',
-          });
+          toast.success('✅ Запит пройшов успішно');
         } else if (res.hits.length === 0) {
           this.setState({ visibleBtnLoading: false });
           toast.warn(
-            '🤔 На жаль по даному запиту нічого не знайдено. Спробуйте змінити запит!📝',
-            {
-              position: 'top-right',
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: 'colored',
-            }
+            '🤔 На жаль по даному запиту нічого не знайдено. Спробуйте змінити запит!📝'
           );
         } else {
           this.setState({ visibleBtnLoading: false });
-          toast.info('Це максимальна кількість фото по данній темі!!!✅', {
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'colored',
-          });
+          toast.info('Це максимальна кількість фото по данній темі!!!✅');
         }
 
         if (!listImage) {

@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { FaSearch } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 import {
   SearchbarContainer,
   SearchForm,
@@ -6,8 +8,6 @@ import {
   Label,
   Input,
 } from './Searchbar.styled';
-import { FaSearch } from 'react-icons/fa';
-import { toast } from 'react-toastify';
 
 export class Searchbar extends Component {
   state = {

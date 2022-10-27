@@ -13,8 +13,8 @@ export const SearchbarContainer = styled.header`
   padding-left: 24px;
   padding-top: 12px;
   padding-bottom: 12px;
-  color: #fff;
-  background-color: #3f51b5;
+  color: ${p => p.theme.colors.textPrimary};
+  background-color: ${p => p.theme.colors.backgroundColor};
   box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
     0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
 `;
@@ -23,7 +23,7 @@ export const SearchForm = styled.form`
   align-items: center;
   width: 100%;
   max-width: 600px;
-  background-color: #fff;
+  background-color: ${p => p.theme.colors.white};
   border-radius: 3px;
   overflow: hidden;
 `;
@@ -38,7 +38,7 @@ export const SearchFormButton = styled.button`
   background-repeat: no-repeat;
   background-position: center;
   opacity: 0.6;
-  transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity ${p => p.theme.colors.transition};
   cursor: pointer;
   outline: none;
   &:hover {
