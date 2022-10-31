@@ -1,77 +1,81 @@
 import { getApi } from '../../utils/Api';
-import { Component } from 'react';
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 import { Loader } from 'components/Loader/Loader';
 import { Button } from '../Button/Button';
 import { List } from './ImageGallery.styled';
 
-export class ImageGallery extends Component {
-  state = {
-    page: 1,
-    listImage: null,
-    visibleBtnLoading: false,
-    isLoader: false,
+export const ImageGallery = ({ nextName }) => {
+  const [name, setName] = useState('');
+  const [page, setPage] = useState(1);
+  const [listImage, setListImage] = useState(null);
+  const [visibleBtnLoading, setVisibleBtnLoading] = useState(false);
+  const [isLoader, setIsLoader] = useState(false);
+
+  const getPage = () => {
+    setPage(page => page + 1);
   };
-  getPage = () => {
-    this.setState(({ page }) => ({ page: page + 1 }));
+  //перевірка для показу кнопки завантажити ще
+  const onVisibleBtnLoading = hits => {
+    if (hits.length / 12 === 1) {
+      setVisibleBtnLoading(true);
+      toast.success('✅ Запит пройшов успішно');
+    } else if (hits.length === 0) {
+      setVisibleBtnLoading(false);
+      toast.warn(
+        '🤔 На жаль по даному запиту нічого не знайдено. Спробуйте змінити запит!📝'
+      );
+    } else {
+      setVisibleBtnLoading(false);
+      toast.info('Це максимальна кількість фото по данній темі!!!✅');
+    }
   };
-
-  async componentDidUpdate(prevProps, prevState) {
-    const prevStatePage = prevState.page;
-    const nextStatePage = this.state.page;
-    const prevName = prevProps.nextName;
-    const nextName = this.props.nextName;
-    const { listImage } = this.state;
-
-    if (prevName !== nextName) {
-      this.setState({ page: 1, listImage: [] });
+  // запит при самбміті форми пошуку
+  useEffect(() => {
+    if (nextName === '' || name === nextName) {
+      return;
     }
+    setPage(1);
+    setListImage([]);
+    getApi(1, nextName, setIsLoader).then(res => {
+      setListImage(res.hits);
+      onVisibleBtnLoading(res.hits);
+    });
+    setName(nextName);
+  }, [name, nextName]);
 
-    if (prevName !== nextName || prevStatePage !== nextStatePage) {
-      try {
-        this.setState({ isLoader: true });
-        const res = await getApi(nextStatePage, nextName);
-        this.setState({ isLoader: false });
-        if (res.hits.length / 12 === 1) {
-          this.setState({ visibleBtnLoading: true });
-          toast.success('✅ Запит пройшов успішно');
-        } else if (res.hits.length === 0) {
-          this.setState({ visibleBtnLoading: false });
-          toast.warn(
-            '🤔 На жаль по даному запиту нічого не знайдено. Спробуйте змінити запит!📝'
-          );
-        } else {
-          this.setState({ visibleBtnLoading: false });
-          toast.info('Це максимальна кількість фото по данній темі!!!✅');
-        }
-
-        if (!listImage) {
-          return this.setState({ listImage: res.hits });
-        }
-
-        this.setState(prevState => {
-          return { listImage: [...prevState.listImage, ...res.hits] };
-        });
-      } catch (error) {
-        console.log(error);
-      }
+  //запит при довантажені фото при натисканні кнопки завантажити ще
+  useEffect(() => {
+    if (page === 1 || name !== nextName) {
+      return;
     }
-  }
+    try {
+      getApi(page, nextName, setIsLoader).then(res => {
+        setListImage(prevState => [...prevState, ...res.hits]);
+        onVisibleBtnLoading(res.hits);
+      });
+    } catch (error) {
+      setVisibleBtnLoading(false);
+      toast.warn(
+        '🤔 На жаль по даному запиту нічого не знайдено. Спробуйте змінити запит!📝'
+      );
+    }
+  }, [name, nextName, page]);
 
-  render() {
-    const { listImage, visibleBtnLoading, isLoader } = this.state;
-    return (
-      <>
-        <List>
-          {listImage &&
-            listImage.map(item => (
-              <ImageGalleryItem key={item.id} item={item} />
-            ))}
-        </List>
-        <Loader visible={isLoader} />
-        {visibleBtnLoading && !isLoader && <Button onClick={this.getPage} />}
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <List>
+        {listImage &&
+          listImage.map(item => <ImageGalleryItem key={item.id} item={item} />)}
+      </List>
+      <Loader visible={isLoader} />
+      {visibleBtnLoading && !isLoader && <Button onClick={getPage} />}
+    </>
+  );
+};
+
+ImageGallery.propTypes = {
+  nextName: PropTypes.string,
+};

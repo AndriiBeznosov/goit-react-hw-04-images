@@ -1,45 +1,39 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import { Overlay, ModalContainer } from './Modal.styled';
 
 const modalRoot = document.getElementById('modal-root');
 
-export default class Modal extends Component {
-  componentDidMount() {
-    window.addEventListener('keydown', this.hendlerKeydown);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.hendlerKeydown);
-  }
-
-  hendlerKeydown = e => {
-    if (e.code === 'Escape') {
-      this.props.onClose();
-    }
-  };
-
-  hendleBackdropClick = e => {
+export const Modal = ({ item, onClose }) => {
+  const hendleBackdropClick = e => {
     if (e.target === e.currentTarget) {
-      this.props.onClose();
+      onClose();
     }
   };
+  const hendlerKeydown = e => {
+    if (e.code === 'Escape') {
+      onClose();
+    }
+  };
+  useEffect(() => {
+    window.addEventListener('keydown', hendlerKeydown);
+    return () => {
+      window.removeEventListener('keydown', hendlerKeydown);
+    };
+  });
 
-  render() {
-    const { webformatURL, tags } = this.props.item;
-    return createPortal(
-      <Overlay onClick={this.hendleBackdropClick}>
-        <ModalContainer>
-          <img src={webformatURL} alt={tags} />
-        </ModalContainer>
-      </Overlay>,
-      modalRoot
-    );
-  }
-}
+  return createPortal(
+    <Overlay onClick={hendleBackdropClick}>
+      <ModalContainer>
+        <img src={item.webformatURL} alt={item.tags} />
+      </ModalContainer>
+    </Overlay>,
+    modalRoot
+  );
+};
 
 Modal.propTypes = {
-  webformatURL: PropTypes.string.isRequired,
-  tags: PropTypes.string.isRequired,
+  item: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
 };

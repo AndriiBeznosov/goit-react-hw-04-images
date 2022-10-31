@@ -1,37 +1,26 @@
-import { Component } from 'react';
-import Modal from 'components/Modal/Modal.jsx';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
+import { Modal } from 'components/Modal/Modal.jsx';
 import { Image, Item } from './ImageGalleryItem.styled.js';
 
-export class ImageGalleryItem extends Component {
-  state = {
-    isOpenModal: false,
+export const ImageGalleryItem = ({ item }) => {
+  const [isOpenModal, setIsOpenModal] = useState(false);
+
+  const openModal = () => {
+    setIsOpenModal(true);
   };
-  openModal = () => {
-    this.setState({ isOpenModal: true });
+  const toggleModal = () => {
+    setIsOpenModal(isOpenModal => !isOpenModal);
   };
 
-  //закрытие модалки по клику на бекдроп
-  hendleBackdropClick = e => {
-    if (e.target === e.currentTarget) {
-      this.props.onClose();
-    }
-  };
+  return (
+    <Item>
+      <Image src={item.webformatURL} alt={item.tags} onClick={openModal} />
+      {isOpenModal && <Modal item={item} onClose={toggleModal} />}
+    </Item>
+  );
+};
 
-  toggleModal = () => {
-    this.setState(({ isOpenModal }) => ({
-      isOpenModal: !isOpenModal,
-    }));
-  };
-
-  render() {
-    const { webformatURL, tags } = this.props.item;
-    return (
-      <Item>
-        <Image src={webformatURL} alt={tags} onClick={this.openModal} />
-        {this.state.isOpenModal && (
-          <Modal item={this.props.item} onClose={this.toggleModal} />
-        )}
-      </Item>
-    );
-  }
-}
+ImageGalleryItem.propTypes = {
+  item: PropTypes.object.isRequired,
+};
